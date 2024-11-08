@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-
+import pycountry_convert as pc
 #
 # Load data
 #
@@ -17,13 +17,22 @@ df = pd.DataFrame.from_records(records)
 doc_id = "120111003737-ff0d62c2f9e64064b73f058095e4f081"
 docs_views_country = df.loc[(df["subject_doc_id"] == doc_id) & (df["event_type"] == "impression")]
 print(docs_views_country["visitor_country"].unique())
+print(docs_views_country.head())
+# Doing continent
+docs_views_country["continent"] = docs_views_country["visitor_country"]
+
+print(pc.country_alpha2_to_continent_code("US"))
+
+for i in docs_views_country.index:
+    docs_views_country.loc[i, "continent"] = pc.country_alpha2_to_continent_code(docs_views_country.loc[i, "visitor_country"])
+print(docs_views_country["continent"].unique())
 
 #
 # View by browser
 #
 # Do we need to make it unique (a user can have a lot of event on the same page, or the user could have click (or did other event) on it a lot)
 docs_views_browser = df["visitor_useragent"].unique()
-print(docs_views_browser)
+#print(docs_views_browser)
 
 # write a function that remove the last part of the user agent (i.e. just Mozilla, not /5.0)
 df["browser"] = df["visitor_useragent"]
