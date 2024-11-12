@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import itertools
 import pycountry_convert as pc
 #
 # Load data
@@ -45,3 +46,44 @@ docs_views_browser = df["browser"].value_counts()
 print(docs_views_browser)
 print(len(df))
 
+x = df.loc[(df["event_type"] == "pagereadtime")]
+x = x.groupby(["visitor_uuid"])[["event_readtime"]].sum()
+x = x.sort_values(by=["event_readtime"], ascending=False)
+x = x.head(10)
+print(x) # only the uuid there
+
+def viewer(doc_uuid):
+    viewers = df.loc[(df["subject_doc_id"] == doc_uuid) & (df["event_type"] == "impression")]
+    return viewers["visitor_uuid"].unique()
+
+def documents(viewer_uuid):
+    document = df.loc[(df["visitor_uuid"] == viewer_uuid) & (df["event_type"] == "impression")]
+    return document["subject_doc_id"].unique()
+
+def also_likes(doc_uuid, user_uuid, sort):
+    vs = viewer(doc_uuid)
+    to_remove = documents(user_uuid)
+    all_ds = []
+    for v in vs:
+        ds = documents(v)
+        all_ds.extend(ds)
+    res_iter = itertools.groupby(all_ds)
+    res = [
+        (key, len(list(group)))
+        for key, group in res_iter
+        if key not in to_remove
+    ]
+    res = sort(res)
+    return res
+
+def sorting(docs):
+    return [
+        z[0]
+        for z in sorted(
+            docs,
+            key=lambda y: y[1],
+            reverse=True
+        )
+    ]
+
+print(also_likes(doc_id, "b417fd6f88d6516d", sorting))
