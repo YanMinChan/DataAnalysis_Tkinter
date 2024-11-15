@@ -2,6 +2,7 @@ import pandas as pd
 import json
 import itertools
 import pycountry_convert as pc
+
 #
 # Load data
 #
@@ -46,11 +47,18 @@ docs_views_browser = df["browser"].value_counts()
 print(docs_views_browser)
 print(len(df))
 
+#
+# Reader profile
+#
 x = df.loc[(df["event_type"] == "pagereadtime")]
 x = x.groupby(["visitor_uuid"])[["event_readtime"]].sum()
 x = x.sort_values(by=["event_readtime"], ascending=False)
 x = x.head(10)
 print(x) # only the uuid there
+
+#
+# Also likes
+#
 
 def viewer(doc_uuid):
     viewers = df.loc[(df["subject_doc_id"] == doc_uuid) & (df["event_type"] == "impression")]
