@@ -119,3 +119,9 @@ class Model:
         Same as ModelV2.also_likes with the ModelV2.sort_default as sort function
         """
         return self.also_likes(doc_id, user_id, self.sort_default)
+    
+    def _event_type_unique(self):
+        """
+        Return a list of "event_type"
+        """
+        return self._df["event_type"].unique()
