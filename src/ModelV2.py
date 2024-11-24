@@ -15,16 +15,17 @@ class Model:
                 records.append(json.loads(line))
         self._df = pd.DataFrame.from_records(records)
 
-    def view_by_country(self, doc_id: str):
+    def view_by_country(self, doc_id: str, print=False):
         """
         Return the dataframe
         The values are in the column "visitor_country"
         """
         docs_views_country = self._df.loc[(self._df["subject_doc_id"] == doc_id) & (self._df["event_type"] == "impression")]
-        print(docs_views_country)
+        if print == True:
+            print(docs_views_country)
         return docs_views_country
 
-    def view_by_continent(self, doc_id: str):
+    def view_by_continent(self, doc_id: str, print=False):
         """
         Return the dataframe
         The values are in the column "continent"
@@ -32,11 +33,12 @@ class Model:
         docs_views_continent = self.view_by_country(doc_id=doc_id)
         def normalize(val: str):
             return pc.country_alpha2_to_continent_code(val)
-        docs_views_continent["continent"] = docs_views_continent["continent"].apply(normalize)
-        print(docs_views_continent)
+        docs_views_continent["continent"] = docs_views_continent["visitor_country"].apply(normalize)
+        if print == True:
+            print(docs_views_continent)
         return docs_views_continent
 
-    def view_by_browser(self):
+    def view_by_browser(self, print=False):
         """
         Return the dataframe
         The values are in the column "browser" (normalized from the "visitor_useragent" column)
@@ -45,10 +47,11 @@ class Model:
         def normalize(val: str):
             return "".join(val.split("/")[:1])
         docs_views_browser["browser"] = docs_views_browser["visitor_useragent"].apply(normalize)
-        print(docs_views_browser)
+        if print == True:
+            print(docs_views_browser)
         return docs_views_browser
 
-    def reader_profile(self):
+    def reader_profile(self, print=False):
         """
         Return the dataframe
         `x.head(10)` to show the 10 most readers
@@ -56,7 +59,8 @@ class Model:
         docs_reader_profile = self._df.loc[(self._df["event_type"] == "pagereadtime")]
         docs_reader_profile = docs_reader_profile.groupby(["visitor_uuid"])[["event_readtime"]].sum()
         docs_reader_profile = docs_reader_profile.sort_values(by=["event_readtime"], ascending=False)
-        print(docs_reader_profile)
+        if print == True:
+            print(docs_reader_profile)
         return docs_reader_profile
 
     def _viewers_for(self, doc_id: str):
