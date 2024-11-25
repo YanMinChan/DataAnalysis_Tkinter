@@ -14,3 +14,7 @@ dev-dependencies = [
     "pandas-stubs>=2.2.3.241009",
     "pyinstaller>=6.11.1",
 ]
+
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
