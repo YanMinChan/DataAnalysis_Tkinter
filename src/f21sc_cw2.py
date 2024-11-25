@@ -1,7 +1,10 @@
-import ModelV2
+import Model
 import View
+import Controller
 
-win = View.Window()
-win.mainloop()
+mdl = Model.Model()
+cnt = Controller.Controller(mdl)
 
-# Testing the ModelV2
+if __name__ == "__main__":
+    win = View.Window(cnt)
+    win.mainloop()

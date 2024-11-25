@@ -1,13 +1,17 @@
 import tkinter as tk
 from typing import override
+from Controller import Controller
+from Model import Model
 
 
 class Window(tk.Tk):
     def __init__(
         self,
+        controller: Controller,
         *args,  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]
         **kwargs,  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]
     ):
+        self.cnt: Controller = controller
         super().__init__(*args, **kwargs)  # pyright: ignore[reportUnknownArgumentType]
         self.title("Home")
         self.geometry("340x200")
@@ -38,7 +42,7 @@ class Window(tk.Tk):
                 label=self.frames[f].page_name, command=self.frames[f].go_to
             )
 
-        self.select_frame(ViewByCountryPage)
+        self.select_frame(BlankPage)
         _ = self.config(menu=menu)
 
     def select_frame(self, frame: type):
@@ -185,7 +189,30 @@ class ViewByMainBrowser(PopUp):
 class ReaderProfiles(PopUp):
     def __init__(self, parent: tk.Frame, window: Window):
         super().__init__(parent, window, "Reader Profiles")
-        # Add method to load reader profile from Model.py
+
+        # GUI column design
+        _ = self.columnconfigure(0, weight=1)
+        _ = self.columnconfigure(1, weight=4)
+
+        self.text: tk.Text = tk.Text(self)
+        self.text.insert(tk.INSERT, "")
+        self.text.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
+
+        btn_text = tk.Button(self, text="Ok", command=self.on_btn_text_clicked)
+        btn_text.grid(row=1, column=1, ipadx=10, pady=5)
+
+        btn_graph = tk.Button(
+            self, text="Generate graph", command=self.on_btn_graph_clicked
+        )
+        btn_graph.grid(row=2, column=1, ipadx=10, pady=5)
+
+    def on_btn_text_clicked(self):
+        s = self.window.cnt.reader_profile_text()
+        self.text.insert(tk.END, s)
+        self.text.update()
+
+    def on_btn_graph_clicked(self):
+        self.window.cnt.reader_profile_graph()
 
     @override
     def go_to(self):
@@ -221,5 +248,10 @@ class AlsoLikes(PopUp):
 
 
 if __name__ == "__main__":
-    win = Window()
+    import os
+
+    mdl = Model()
+    cnt = Controller(mdl)
+    cnt.load_file(os.path.join(os.path.dirname(__file__), "..", "sample_small.json"))
+    win = Window(cnt)
     win.mainloop()
