@@ -1,5 +1,5 @@
 /dist/
 /build/
-__pycache__/*
+__pycache__
 /.venv/
 /f21sc_cw2
