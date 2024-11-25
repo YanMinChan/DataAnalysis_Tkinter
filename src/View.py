@@ -136,11 +136,7 @@ class ViewByBrowser(PopUp):
         label = tk.Label(self, text="Event type")
         label.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
         event_name = tk.StringVar()
-        options = [
-            "a",
-            "b",
-            "c",
-        ]  # CHANGE THIS ONEEEEEEEE TO A METHOD THAT RECEIVE EVENT TYPE FROM MODEL.PY!!!!!!!!!!!!!
+        options = window.cnt._model.event_type_unique() #Kinda weird but stay like this first
         event_optionMenu = tk.OptionMenu(self, event_name, *options)
         event_optionMenu.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
 
@@ -167,11 +163,7 @@ class ViewByMainBrowser(PopUp):
         label = tk.Label(self, text="Event type")
         label.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
         event_name = tk.StringVar()
-        options = [
-            "a",
-            "b",
-            "c",
-        ]  # CHANGE THIS ONEEEEEEEE TO A METHOD THAT RECEIVE EVENT TYPE FROM MODEL.PY!!!!!!!!!!!!!
+        options = window.cnt._model.event_type_unique() #Kinda weird but stay like this first
         event_optionMenu = tk.OptionMenu(self, event_name, *options)
         event_optionMenu.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
 
