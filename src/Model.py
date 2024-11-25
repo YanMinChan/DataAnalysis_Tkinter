@@ -147,7 +147,7 @@ class Model:
         """
         return self.also_likes(doc_id, user_id, self.sort_default)
 
-    def _event_type_unique(self) -> set[str]:
+    def event_type_unique(self) -> set[str]:
         """
         Return a list of "event_type"
         """
