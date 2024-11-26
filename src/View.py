@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter.filedialog import askopenfilename
 from typing import override
 from Controller import Controller
 from Model import Model
@@ -66,6 +67,12 @@ class PopUp(tk.Frame):
 class BlankPage(PopUp):
     def __init__(self, parent: tk.Frame, window: Window):
         super().__init__(parent, window, "Home")
+        btn = tk.Button(self, text="Load File", command=self.on_btn_load_file)
+        btn.grid(row=0, column=0)
+
+    def on_btn_load_file(self):
+        file = askopenfilename(defaultextension=".json")
+        self.window.cnt.load_file(file)
 
     @override
     def go_to(self):
@@ -136,9 +143,9 @@ class ViewByBrowser(PopUp):
         label = tk.Label(self, text="Event type")
         label.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
         event_name = tk.StringVar()
-        options = window.cnt._model.event_type_unique() #Kinda weird but stay like this first
-        event_optionMenu = tk.OptionMenu(self, event_name, *options)
-        event_optionMenu.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
+        #options = window.cnt._model.event_type_unique() #Kinda weird but stay like this first
+        #event_optionMenu = tk.OptionMenu(self, event_name, *options)
+        #event_optionMenu.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
 
         # The buttons
         view_by_browser_button = tk.Button(
@@ -159,22 +166,29 @@ class ViewByMainBrowser(PopUp):
         _ = self.columnconfigure(0, weight=1)
         _ = self.columnconfigure(1, weight=4)
 
+        self.inited: bool = False
+
         # The menu of event type
         label = tk.Label(self, text="Event type")
         label.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
-        event_name = tk.StringVar()
-        options = window.cnt._model.event_type_unique() #Kinda weird but stay like this first
-        event_optionMenu = tk.OptionMenu(self, event_name, *options)
-        event_optionMenu.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
+        self.event_name = tk.StringVar()
+
 
         # The buttons
         view_by_main_browser_button = tk.Button(
-            self, text="Ok", command="view_by_main_browser_clicked"
+            self, text="Ok", command=self.view_by_main_browser_clicked
         )
         view_by_main_browser_button.grid(row=1, column=1, ipadx=10, pady=5)
 
+    def view_by_main_browser_clicked(self):
+        self.window.cnt.view_by_browser_graph()
+
     @override
     def go_to(self):
+        if not self.inited:
+            options = self.window.cnt._model.event_type_unique() #Kinda weird but stay like this first
+            event_optionMenu = tk.OptionMenu(self, self.event_name, *options)
+            event_optionMenu.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
         super().go_to()
 
 
@@ -200,7 +214,8 @@ class ReaderProfiles(PopUp):
 
     def on_btn_text_clicked(self):
         s = self.window.cnt.reader_profile_text()
-        self.text.insert(tk.END, s)
+        self.text.delete("1.0", tk.END)
+        self.text.insert(tk.INSERT, s)
         self.text.update()
 
     def on_btn_graph_clicked(self):
@@ -226,13 +241,33 @@ class AlsoLikes(PopUp):
         docID_entry = tk.Entry(self, textvariable=self.docID)
         docID_entry.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
 
+        label = tk.Label(self, text="User UUID")
+        label.grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
+        self.userID: tk.StringVar = tk.StringVar()  # store userID value
+        userID_entry = tk.Entry(self, textvariable=self.userID)
+        userID_entry.grid(row=1, column=1, sticky=tk.EW, padx=5, pady=5)
+
         # The buttons
-        also_likes_button = tk.Button(self, text="Ok", command="also_likes_clicked")
-        also_likes_button.grid(row=1, column=1, ipadx=10, pady=5)
+        also_likes_button = tk.Button(self, text="Ok", command=self.also_like_clicked_text)
+        also_likes_button.grid(row=2, column=1, ipadx=10, pady=5)
         also_likes_generate_graph = tk.Button(
             self, text="Generate graph", command="also_likes_generate_graph_clicked"
         )
-        also_likes_generate_graph.grid(row=2, column=1, ipadx=10, pady=5)
+        also_likes_generate_graph.grid(row=3, column=1, ipadx=10, pady=5)
+
+        # Textbox
+        self.text = tk.Text(self)
+        self.text.insert(tk.INSERT, "")
+        self.text.grid(row=4, column=0, sticky=tk.W, padx=5, pady=5)
+
+    def also_like_clicked_text(self):
+        print("It worked!")
+        s = self.window.cnt.also_like_text(docID=self.docID, userID=self.userID)
+        self.text.delete("1.0", tk.END)
+        self.text.insert(tk.INSERT, s)
+        self.text.update()
+
+
 
     @override
     def go_to(self):

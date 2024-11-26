@@ -133,19 +133,24 @@ class Model:
         return res_sort
 
     @staticmethod
-    def sort_default(docs: list[tuple[str, int]]):
+    def sort_default(docs: list[tuple[str, int]]) -> list[str]:
         """
         Return a list of document sorted by the number of occurence
         The return is list[str]
         """
-        sorted_by_cross_view = sorted(docs, key=lambda y: y[1], reverse=True)
+        sorted_by_cross_view = Model.sort_show_weight(docs)
         return [z[0] for z in sorted_by_cross_view]
+    
+    @staticmethod
+    def sort_show_weight(docs: list[tuple[str, int]]) -> list[tuple[str, int]]:
+        sorted_by_cross_view = sorted(docs, key=lambda y: y[1], reverse=True)
+        return sorted_by_cross_view
 
     def also_likes_default(self, doc_id: str, user_id: str):
         """
         Same as ModelV2.also_likes with the ModelV2.sort_default as sort function
         """
-        return self.also_likes(doc_id, user_id, self.sort_default)
+        return self.also_likes(doc_id, user_id, Model.sort_default)
 
     def event_type_unique(self) -> set[str]:
         """

@@ -22,10 +22,35 @@ class Controller:
         _ = ax.bar_label(bar_container, labels=labels)
         fig.show()
 
+    def view_by_browser_text(self, event_type: str) -> str:
+        df = self._model.view_by_browser()
+        s = repr(df["browser"].value_counts())
+        return s
+    
+    def view_by_browser_graph(self) -> None:
+        df = self._model.view_by_browser()
+        browsers = df["browser"].unique()
+        fig, ax = plt.subplots()
+        positions = np.arange(len(browsers))
+        values = [float(y) for y in df["browser"].value_counts().values]
+        labels = [label for label in df["browser"].value_counts().index]
+        bar_container = ax.bar(
+            height=values, x=positions, width=1, align="edge"
+        )
+        _ = ax.bar_label(bar_container, labels=labels)
+        fig.show()
+
     def reader_profile_text(self) -> str:
         profiles = self._model.reader_profile()
-        s = repr(profiles)
+        s = repr(profiles.head(10))
         return s
+    
+    def also_like_text(self, docID: str, userID: str) -> str:
+        likes = self._model.also_likes(doc_id=docID, user_id=userID, sort=Model.sort_show_weight)
+        text = ""
+        for item in likes:
+            text += f"- {item[0]} : {item[1]}\n"
+        return text
 
 
 if __name__ == "__main__":
