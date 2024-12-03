@@ -18,11 +18,12 @@ class Controller:
 
         values = [float(y[0]) for y in profiles[["event_readtime"]].head(10).values]
         labels = ["*" + label[-4:] for label in profiles.head(10).index]
-        plt.barh(width=values, y=labels, linewidth=0.7)
-        plt.ylabel("Reader user ID (last four characters)")
-        plt.xlabel("Total time spent")
-        plt.title("Reader profile")
-        plt.show()
+        fig, ax = plt.subplots()
+        ax.barh(width=values, y=labels, linewidth=0.7)
+        ax.set_ylabel("Reader user ID (last four characters)")
+        ax.set_xlabel("Total time spent")
+        ax.set_title("Reader profile")
+        fig.show()
 
     # Return the top 10 reader
     def reader_profile_text(self) -> str:
@@ -49,11 +50,12 @@ class Controller:
         browsers = self._model.view_by_browser()["visitor_useragent"]
         values = [float(y) for y in browsers.value_counts().values]
         labels = [label for label in browsers.value_counts().index]
-        plt.bar(height=values, x=labels)
-        plt.xlabel("Main browser")
-        plt.ylabel("Total number of occurrences")
-        plt.title("Views by browser")
-        plt.show()
+        fig, ax = plt.subplots()
+        ax.bar(height=values, x=labels)
+        ax.set_xlabel("Main browser")
+        ax.set_ylabel("Total number of occurrences")
+        ax.set_title("Views by browser")
+        fig.show()
 
     def view_by_browser_text(self, event_type: str) -> str:
         """
@@ -71,14 +73,15 @@ class Controller:
         browsers = self._model.view_by_browser()["browser"]
         values = [float(y) for y in browsers.value_counts().values]
         labels = [label for label in browsers.value_counts().index]
-        plt.bar(height=values, x=labels)
-        plt.xlabel("Main browser")
-        plt.ylabel("Total number of occurrences")
-        plt.title("Views by browser")
-        plt.show()
+        fig, ax = plt.subplots()
+        ax.bar(height=values, x=labels)
+        ax.set_xlabel("Main browser")
+        ax.set_ylabel("Total number of occurrences")
+        ax.set_title("Views by browser")
+        fig.show()
 
     def also_like_text(self, docID: str, userID: str) -> str:
-        likes = self._model.also_likes(
+        likes, _ = self._model.also_likes(
             doc_id=docID, user_id=userID, sort=Model.sort_show_weight
         )
         text = ""
@@ -93,21 +96,23 @@ class Controller:
         countries = self._model.view_by_country(doc_id=docID)["visitor_country"]
         values = [float(y) for y in countries.value_counts().values]
         labels = [label for label in countries.value_counts().index]
-        plt.bar(height=values, x=labels)
-        plt.xlabel("Country")
-        plt.ylabel("Total number of occurrences")
-        plt.title("Views by country of document " + "*" + docID[-4:])
-        plt.show()
+        fig, ax = plt.subplots()
+        ax.bar(height=values, x=labels)
+        ax.set_xlabel("Country")
+        ax.set_ylabel("Total number of occurrences")
+        ax.set_title("Views by country of document " + "*" + docID[-4:])
+        fig.show()
 
     def view_by_continent_graph(self, docID: str):
         continents = self._model.view_by_continent(doc_id=docID)["continent"]
         values = [float(y) for y in continents.value_counts().values]
         labels = [label for label in continents.value_counts().index]
-        plt.bar(height=values, x=labels)
-        plt.xlabel("Continent")
-        plt.ylabel("Total number of occurrences")
-        plt.title("Views by continent of document " + "*" + docID[-4:])
-        plt.show()
+        fig, ax = plt.subplots()
+        ax.bar(height=values, x=labels)
+        ax.set_xlabel("Continent")
+        ax.set_ylabel("Total number of occurrences")
+        ax.set_title("Views by continent of document " + "*" + docID[-4:])
+        fig.show()
 
 
 if __name__ == "__main__":

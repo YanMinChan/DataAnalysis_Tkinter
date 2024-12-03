@@ -16,7 +16,7 @@ class Model:
         records: list[Any] = []
         lines = []
         if isinstance(file, str):
-            with open(file) as f:
+            with open(file, mode="r", encoding='utf-8') as f:
                 lines = f.readlines()
         else:
             lines = file.readlines()
@@ -118,7 +118,7 @@ class Model:
         doc_id: str,
         user_id: str,
         sort: Callable[[list[tuple[str, int]]], SortType],
-    ) -> SortType:
+    ) -> tuple[SortType, dict[str, list[str]]]:
         """
         Return list of documents the user can likes based on others reader and what they read.
         The sorting function take a list[tuple[doc_id, number_of_occurence]]
@@ -126,15 +126,20 @@ class Model:
         """
         viewers_for_doc = self._viewers_for(doc_id)
         doc_already_read = self._document_read_for(user_id)
+        graph = {}
         all_documents: list[str] = []
         for doc_viewer in viewers_for_doc:
             docs_read = self._document_read_for(doc_viewer)
+            for doc in docs_read:
+                if doc not in graph:
+                    graph[doc] = []
+                graph[doc].append(doc_viewer)
             all_documents.extend(docs_read)
         all_documents = [doc for doc in all_documents if doc not in doc_already_read]
         res_iter = itertools.groupby(all_documents)
         res = [(key, len(list(group))) for key, group in res_iter]
         res_sort = sort(res)
-        return res_sort
+        return res_sort, graph
 
     @staticmethod
     def sort_default(docs: list[tuple[str, int]]) -> list[str]:
@@ -165,6 +170,7 @@ class Model:
 
 if __name__ == "__main__":
     import os
+    import GraphViz
 
     model = Model()
     model.load_data(os.path.join(os.path.dirname(__file__), "..", "sample_small.json"))
@@ -186,12 +192,14 @@ if __name__ == "__main__":
     print(df)
 
     # more tests
-    # model = Model()
-    # model.load_data(os.path.join(os.path.dirname(__file__), "..", "sample_3m_lines.json"))
-    # document = model._df.loc[
-    #     (model._df["event_type"] == "impression")
-    # ]["env_doc_id"].value_counts()
-    # print(document)
-    #
-    # df = model.also_likes_default("121109150636-bdf13c63b3964e1494a82f6c144024e2", "d9c9f5e099ac4746")
-    # print(df)
+    model = Model()
+    model.load_data(os.path.join(os.path.dirname(__file__), "..", "sample_3m_lines.json"))
+    document = model._df.loc[
+        (model._df["event_type"] == "impression")
+    ]["env_doc_id"].value_counts()
+    print(document)
+
+    sorts, graph = model.also_likes_default("121109150636-bdf13c63b3964e1494a82f6c144024e2", "d9c9f5e099ac4746")
+    print(graph)
+    GraphViz.render("d9c9f5e099ac4746", "121109150636-bdf13c63b3964e1494a82f6c144024e2", sorts, graph)
+    print(df)
