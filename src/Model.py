@@ -14,13 +14,14 @@ class Model:
 
     def load_data(self, file: str | Any):
         records: list[Any] = []
+        lines = []
         if isinstance(file, str):
             with open(file) as f:
-                for line in f:
-                    records.append(json.loads(line))
+                lines = f.readlines()
         else:
-            for line in file:
-                records.append(json.loads(line))
+            lines = file.readlines()
+        for line in lines:
+            records.append(json.loads(line))
         self._df = pd.DataFrame.from_records(records)
 
     def view_by_country(self, doc_id: str, debug: bool = False) -> pd.DataFrame:
@@ -29,7 +30,7 @@ class Model:
         The values are in the column "visitor_country"
         """
         docs_views_country = self._df.loc[
-            (self._df["subject_doc_id"] == doc_id)
+            (self._df["env_doc_id"] == doc_id)
             & (self._df["event_type"] == "impression")
         ]
         if debug == True:
@@ -97,7 +98,7 @@ class Model:
         Return the list of viewer for a document
         """
         viewers = self._df.loc[
-            (self._df["subject_doc_id"] == doc_id)
+            (self._df["env_doc_id"] == doc_id)
             & (self._df["event_type"] == "impression")
         ]
         return set(viewers["visitor_uuid"].unique())
@@ -110,7 +111,7 @@ class Model:
             (self._df["visitor_uuid"] == user_id)
             & (self._df["event_type"] == "impression")
         ]
-        return set(document["subject_doc_id"].unique())
+        return set(document["env_doc_id"].unique())
 
     def also_likes(
         self,
@@ -129,12 +130,9 @@ class Model:
         for doc_viewer in viewers_for_doc:
             docs_read = self._document_read_for(doc_viewer)
             all_documents.extend(docs_read)
+        all_documents = [doc for doc in all_documents if doc not in doc_already_read]
         res_iter = itertools.groupby(all_documents)
-        res: list[tuple[str, int]] = [
-            (key, len(list(group)))
-            for key, group in res_iter
-            if key not in doc_already_read
-        ]
+        res = [(key, len(list(group))) for key, group in res_iter]
         res_sort = sort(res)
         return res_sort
 
@@ -186,3 +184,14 @@ if __name__ == "__main__":
 
     df = model.also_likes_default(doc_id=doc_id, user_id=user_id)
     print(df)
+
+    # more tests
+    # model = Model()
+    # model.load_data(os.path.join(os.path.dirname(__file__), "..", "sample_3m_lines.json"))
+    # document = model._df.loc[
+    #     (model._df["event_type"] == "impression")
+    # ]["env_doc_id"].value_counts()
+    # print(document)
+    #
+    # df = model.also_likes_default("121109150636-bdf13c63b3964e1494a82f6c144024e2", "d9c9f5e099ac4746")
+    # print(df)

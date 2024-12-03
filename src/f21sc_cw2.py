@@ -14,14 +14,14 @@ def parse_args():
         return None
     parser = argparse.ArgumentParser(description="")
     _ = parser.add_argument(
-        "-u", nargs=1, metavar="user_uuid", type=str, help="user uuid"
+        "-u", nargs=1, metavar="user_uuid", type=str, help="user uuid", default=[None]
     )
     _ = parser.add_argument(
-        "-d", nargs=1, metavar="doc_uuid", type=str, help="document uuid"
+        "-d", nargs=1, metavar="doc_uuid", type=str, help="document uuid", default=[None]
     )
-    _ = parser.add_argument("-t", nargs=1, metavar="task_id", type=str, help="task id")
+    _ = parser.add_argument("-t", nargs=1, metavar="task_id", type=str, help="task id", default=[None])
     _ = parser.add_argument(
-        "-f", nargs=1, metavar="file", type=argparse.FileType("r"), help="json file"
+        "-f", nargs=1, metavar="file", type=argparse.FileType("r"), help="json file", default=[None]
     )
     _ = parser.add_argument(
         "--gui",
@@ -46,10 +46,9 @@ def main() -> int:
     if args is None:
         return gui_app()
     task_id = args.t[0]
-    doc_uuid = args.d
-    user_uuid = args.u
+    doc_uuid = args.d[0]
+    user_uuid = args.u[0]
     file = args.f[0]
-    cnt.load_file(file)
     gui = True if args.gui else False
 
     actions = {
@@ -103,6 +102,10 @@ def main() -> int:
     if action_task_fn is None:
         print("task_id is unknown", file=sys.stderr)
         return 1
+    if None in action_task["args"] or file is None:
+        print("Arguments are missings", file=sys.stderr)
+        return 1
+    cnt.load_file(file)
 
     s = action_task_fn(
         *action_task["args"]  # pyright: ignore[reportCallIssue, reportArgumentType]
