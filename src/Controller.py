@@ -30,15 +30,37 @@ class Controller:
         Return the top 10 reader and their total time spent in text
         """
         profiles = self._model.reader_profile()
-        s = repr(profiles.head(10))
+        s = profiles.head(10).to_string()
         return s
+
+    def view_by_full_browser_text(self, event_type: str) -> str:
+        """
+        Return the number of occurrences of each main browser in text
+        """
+        df = self._model.view_by_browser()
+        s = df["visitor_useragent"].value_counts().to_string()
+        return s
+
+    def view_by_full_browser_graph(self, event_type: str) -> None:
+        """
+        Return a bar plot of the number of occurrences of each main browsers
+        """
+        # occurrence for different "event_type" not implemented yet
+        browsers = self._model.view_by_browser()["visitor_useragent"]
+        values = [float(y) for y in browsers.value_counts().values]
+        labels = [label for label in browsers.value_counts().index]
+        plt.bar(height=values, x=labels)
+        plt.xlabel("Main browser")
+        plt.ylabel("Total number of occurrences")
+        plt.title("Views by browser")
+        plt.show()
 
     def view_by_browser_text(self, event_type: str) -> str:
         """
         Return the number of occurrences of each main browser in text
         """
         df = self._model.view_by_browser()
-        s = repr(df["browser"].value_counts())
+        s = df["browser"].value_counts().to_string()
         return s
 
     def view_by_browser_graph(self, event_type: str) -> None:

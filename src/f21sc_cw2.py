@@ -49,7 +49,6 @@ def main() -> int:
     doc_uuid = args.d
     user_uuid = args.u
     file = args.f[0]
-    print(file)
     cnt.load_file(file)
     gui = True if args.gui else False
 
@@ -65,8 +64,8 @@ def main() -> int:
             "args": [doc_uuid],
         },
         "3a": {
-            True: cnt.view_by_browser_graph,  # TODO: this should display full user agent
-            False: cnt.view_by_browser_text,  # TODO: this should display full user agent
+            True: cnt.view_by_full_browser_graph,
+            False: cnt.view_by_full_browser_text,
             "args": [""],  # TODO: event type
         },
         "3b": {
