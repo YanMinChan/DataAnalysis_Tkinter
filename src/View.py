@@ -103,7 +103,6 @@ class ViewByCountryPage(PopUp):
     def view_by_country_clicked(self):
         self.window.cnt.view_by_country_graph(docID=self.docID.get())
 
-
     @override
     def go_to(self):
         super().go_to()
@@ -162,7 +161,9 @@ class ViewByBrowser(PopUp):
     @override
     def go_to(self):
         if not self.inited:
-            options = self.window.cnt._model.event_type_unique() #Kinda weird but stay like this first
+            options = (
+                self.window.cnt._model.event_type_unique()
+            )  # Kinda weird but stay like this first
             event_optionMenu = tk.OptionMenu(self, self.event_name, *options)
             event_optionMenu.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
         super().go_to()
@@ -183,7 +184,6 @@ class ViewByMainBrowser(PopUp):
         label.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
         self.event_name = tk.StringVar()
 
-
         # The buttons
         view_by_main_browser_button = tk.Button(
             self, text="Ok", command=self.view_by_main_browser_clicked
@@ -196,7 +196,9 @@ class ViewByMainBrowser(PopUp):
     @override
     def go_to(self):
         if not self.inited:
-            options = self.window.cnt._model.event_type_unique() #Kinda weird but stay like this first
+            options = (
+                self.window.cnt._model.event_type_unique()
+            )  # Kinda weird but stay like this first
             event_optionMenu = tk.OptionMenu(self, self.event_name, *options)
             event_optionMenu.grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
         super().go_to()
@@ -258,7 +260,9 @@ class AlsoLikes(PopUp):
         userID_entry.grid(row=1, column=1, sticky=tk.EW, padx=5, pady=5)
 
         # The buttons
-        also_likes_button = tk.Button(self, text="Ok", command=self.also_like_clicked_text)
+        also_likes_button = tk.Button(
+            self, text="Ok", command=self.also_like_clicked_text
+        )
         also_likes_button.grid(row=2, column=1, ipadx=10, pady=5)
         also_likes_generate_graph = tk.Button(
             self, text="Generate graph", command="also_likes_generate_graph_clicked"
@@ -272,12 +276,12 @@ class AlsoLikes(PopUp):
 
     def also_like_clicked_text(self):
         print("It worked!")
-        s = self.window.cnt.also_like_text(docID=self.docID.get(), userID=self.userID.get())
+        s = self.window.cnt.also_like_text(
+            docID=self.docID.get(), userID=self.userID.get()
+        )
         self.text.delete("1.0", tk.END)
         self.text.insert(tk.INSERT, s)
         self.text.update()
-
-
 
     @override
     def go_to(self):

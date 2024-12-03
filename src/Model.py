@@ -12,10 +12,14 @@ class Model:
         self._df: pd.DataFrame = pd.DataFrame()
         pass
 
-    def load_data(self, file: str):
+    def load_data(self, file: str | Any):
         records: list[Any] = []
-        with open(file) as f:
-            for line in f:
+        if isinstance(file, str):
+            with open(file) as f:
+                for line in f:
+                    records.append(json.loads(line))
+        else:
+            for line in file:
                 records.append(json.loads(line))
         self._df = pd.DataFrame.from_records(records)
 
@@ -59,8 +63,10 @@ class Model:
         """
         docs_views_browser = self._df
 
-        def normalize(val: str):
-            return "".join(val.split("/")[:1])
+        def normalize(val: Any):
+            if isinstance(val, str):
+                return "".join(val.split("/")[:1])
+            return ""
 
         docs_views_browser = docs_views_browser.assign(
             browser=docs_views_browser["visitor_useragent"]
@@ -140,7 +146,7 @@ class Model:
         """
         sorted_by_cross_view = Model.sort_show_weight(docs)
         return [z[0] for z in sorted_by_cross_view]
-    
+
     @staticmethod
     def sort_show_weight(docs: list[tuple[str, int]]) -> list[tuple[str, int]]:
         sorted_by_cross_view = sorted(docs, key=lambda y: y[1], reverse=True)
