@@ -1,10 +1,21 @@
 import itertools
-import json
-from typing import Any, Callable, TypeVar
+import orjson
+import mmap
+import os
+from typing import Any, Callable, Generator, TypeVar
 import pandas as pd
 import pycountry_convert as pc
+from time import perf_counter
+
 
 SortType = TypeVar("SortType")
+
+def _read_generator(mmap_file: mmap.mmap) -> Generator[bytes, Any, Any]:
+    while mmap_file.tell() != mmap_file.size():
+        line = mmap_file.readline()
+        if len(line) == 0:
+            continue
+        yield line
 
 
 class Model:
@@ -12,29 +23,43 @@ class Model:
         self._df: pd.DataFrame = pd.DataFrame()
         pass
 
-    def load_data(self, file: str | Any):
+    def load_data(self, file: str | Any, debug: bool = True):
+        start = perf_counter()
+
         records: list[Any] = []
-        lines = []
-        if isinstance(file, str):
-            with open(file, mode="r", encoding='utf-8') as f:
-                lines = f.readlines()
-        else:
-            lines = file.readlines()
-        for line in lines:
-            records.append(json.loads(line))
+        provided_file_obj = not isinstance(file, str)
+        if not provided_file_obj:
+            file = open(file, mode="r", encoding='utf-8')
+        # map file to RAM for faster read time
+        with mmap.mmap(file.fileno(), length=0, access=mmap.ACCESS_READ) as f:
+            for line in _read_generator(f):
+                records.append(orjson.loads(line))
+        if not provided_file_obj:
+            file.close()
+        between = perf_counter()
         self._df = pd.DataFrame.from_records(records)
+
+        end = perf_counter()
+        if debug:
+            print("load_data:json", between - start, "seconds")
+            print("load_data:pd", end - between, "seconds")
 
     def view_by_country(self, doc_id: str, debug: bool = False) -> pd.DataFrame:
         """
         Return the dataframe
         The values are in the column "visitor_country"
         """
+        start = perf_counter()
+
         docs_views_country = self._df.loc[
             (self._df["env_doc_id"] == doc_id)
             & (self._df["event_type"] == "impression")
         ]
+
+        end = perf_counter()
         if debug == True:
-            print(docs_views_country)
+            print("view_by_country", end - start, "seconds")
+
         return docs_views_country
 
     def view_by_continent(self, doc_id: str, debug: bool = False) -> pd.DataFrame:
@@ -42,6 +67,8 @@ class Model:
         Return the dataframe
         The values are in the column "continent"
         """
+        start = perf_counter()
+
         docs_views_continent = self.view_by_country(doc_id=doc_id)
 
         def normalize(val: str) -> str:
@@ -53,8 +80,10 @@ class Model:
         docs_views_continent["continent"] = docs_views_continent["continent"].apply(
             normalize
         )
+
+        end = perf_counter()
         if debug == True:
-            print(docs_views_continent)
+            print("view_by_continent", end - start, "seconds")
         return docs_views_continent
 
     def view_by_browser(self, debug: bool = False) -> pd.DataFrame:
@@ -62,6 +91,8 @@ class Model:
         Return the dataframe
         The values are in the column "browser" (normalized from the "visitor_useragent" column)
         """
+        start = perf_counter()
+
         docs_views_browser = self._df
 
         def normalize(val: Any):
@@ -73,24 +104,29 @@ class Model:
             browser=docs_views_browser["visitor_useragent"]
         )
         docs_views_browser["browser"] = docs_views_browser["browser"].apply(normalize)
+
+        end = perf_counter()
         if debug == True:
-            print(docs_views_browser)
+            print("view_by_browser", end - start, "seconds")
         return docs_views_browser
 
-    def reader_profile(self, debug: bool = False) -> pd.DataFrame:
+    def reader_profile(self, top: int = 10, debug: bool = True) -> pd.DataFrame:
         """
         Return the dataframe
-        `x.head(10)` to show the 10 most readers
         """
+        start = perf_counter()
+
         docs_reader_profile = self._df.loc[(self._df["event_type"] == "pagereadtime")]
         docs_reader_profile = docs_reader_profile.groupby(["visitor_uuid"])[
             ["event_readtime"]
-        ].sum()
+        ].sum().head(top)
         docs_reader_profile = docs_reader_profile.sort_values(
             by=["event_readtime"], ascending=False
         )
+
+        end = perf_counter()
         if debug == True:
-            print(docs_reader_profile)
+            print("reader_profile", end - start, "seconds")
         return docs_reader_profile
 
     def _viewers_for(self, doc_id: str) -> set[str]:
@@ -103,43 +139,49 @@ class Model:
         ]
         return set(viewers["visitor_uuid"].unique())
 
-    def _document_read_for(self, user_id: str) -> set[str]:
+    def _document_read_for(self, user_id: str | list[str]) -> pd.DataFrame:
         """
         Return the list of document read by a user
         """
+        mask = None
+        if isinstance(user_id, str):
+            mask = self._df["visitor_uuid"] == user_id
+        else:
+            mask = self._df["visitor_uuid"].isin(user_id)
         document = self._df.loc[
-            (self._df["visitor_uuid"] == user_id)
+            (mask)
             & (self._df["event_type"] == "impression")
         ]
-        return set(document["env_doc_id"].unique())
+        document = document.drop_duplicates(subset=["env_doc_id", "visitor_uuid"])
+        return document
 
     def also_likes(
         self,
         doc_id: str,
         user_id: str,
         sort: Callable[[list[tuple[str, int]]], SortType],
-    ) -> tuple[SortType, dict[str, list[str]]]:
+        with_graph: bool = False,
+        debug: bool = True,
+    ) -> tuple[SortType, pd.DataFrame]:
         """
         Return list of documents the user can likes based on others reader and what they read.
         The sorting function take a list[tuple[doc_id, number_of_occurence]]
         The result is the result of the sort function
         """
+        start = perf_counter()
+
         viewers_for_doc = self._viewers_for(doc_id)
-        doc_already_read = self._document_read_for(user_id)
-        graph = {}
-        all_documents: list[str] = []
-        for doc_viewer in viewers_for_doc:
-            docs_read = self._document_read_for(doc_viewer)
-            for doc in docs_read:
-                if doc not in graph:
-                    graph[doc] = []
-                graph[doc].append(doc_viewer)
-            all_documents.extend(docs_read)
-        all_documents = [doc for doc in all_documents if doc not in doc_already_read]
-        res_iter = itertools.groupby(all_documents)
-        res = [(key, len(list(group))) for key, group in res_iter]
-        res_sort = sort(res)
-        return res_sort, graph
+        doc_already_read = self._document_read_for(user_id)["env_doc_id"].unique()
+        all_documents = self._document_read_for(list(viewers_for_doc))
+        reco = all_documents.value_counts(subset=["env_doc_id"])
+        print(reco)
+        res_iter = [(key[0], int(reco[key[0]])) for key in reco.index if key[0] not in doc_already_read]
+        res_sort = sort(res_iter)
+
+        end = perf_counter()
+        if debug:
+            print("also_likes", end - start, "seconds")
+        return res_sort, all_documents
 
     @staticmethod
     def sort_default(docs: list[tuple[str, int]]) -> list[str]:
