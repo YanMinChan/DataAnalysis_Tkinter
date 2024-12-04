@@ -17,11 +17,31 @@ def parse_args():
         "-u", nargs=1, metavar="user_uuid", type=str, help="user uuid", default=[None]
     )
     _ = parser.add_argument(
-        "-d", nargs=1, metavar="doc_uuid", type=str, help="document uuid", default=[None]
+        "-d",
+        nargs=1,
+        metavar="doc_uuid",
+        type=str,
+        help="document uuid",
+        default=[None],
     )
-    _ = parser.add_argument("-t", nargs=1, metavar="task_id", type=str, help="task id", default=[None])
     _ = parser.add_argument(
-        "-f", nargs=1, metavar="file", type=argparse.FileType("r"), help="json file", default=[None]
+        "-t", nargs=1, metavar="task_id", type=str, help="task id", default=[None]
+    )
+    _ = parser.add_argument(
+        "-f",
+        nargs=1,
+        metavar="file",
+        type=argparse.FileType("r"),
+        help="json file",
+        default=[None],
+    )
+    _ = parser.add_argument(
+        "--disable-cache",
+        metavar="disable_cache",
+        action="store_const",
+        const=True,
+        default=False,
+        help="disable cache for file (create another file with the same name .pkl by default)",
     )
     _ = parser.add_argument(
         "--gui",
@@ -50,6 +70,7 @@ def main() -> int:
     user_uuid = args.u[0]
     file = args.f[0]
     gui = True if args.gui else False
+    disable_cache = True if args.disable_cache else False
 
     actions = {
         "2a": {
@@ -105,7 +126,7 @@ def main() -> int:
     if None in action_task["args"] or file is None:
         print("Arguments are missings", file=sys.stderr)
         return 1
-    cnt.load_file(file)
+    cnt.load_file(file.name, disable_cache)
 
     s = action_task_fn(
         *action_task["args"]  # pyright: ignore[reportCallIssue, reportArgumentType]

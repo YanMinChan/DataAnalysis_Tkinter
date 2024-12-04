@@ -10,6 +10,7 @@ from time import perf_counter
 
 SortType = TypeVar("SortType")
 
+
 def _read_generator(mmap_file: mmap.mmap) -> Generator[bytes, Any, Any]:
     while mmap_file.tell() != mmap_file.size():
         line = mmap_file.readline()
@@ -23,21 +24,33 @@ class Model:
         self._df: pd.DataFrame = pd.DataFrame()
         pass
 
-    def load_data(self, file: str | Any, debug: bool = True):
+    def load_data(self, file: str, disable_cache: bool = False, debug: bool = False):
         start = perf_counter()
+        between = None
 
-        records: list[Any] = []
-        provided_file_obj = not isinstance(file, str)
-        if not provided_file_obj:
-            file = open(file, mode="r", encoding='utf-8')
-        # map file to RAM for faster read time
-        with mmap.mmap(file.fileno(), length=0, access=mmap.ACCESS_READ) as f:
-            for line in _read_generator(f):
-                records.append(orjson.loads(line))
-        if not provided_file_obj:
-            file.close()
-        between = perf_counter()
-        self._df = pd.DataFrame.from_records(records)
+        file_pickle = file + ".pkl"
+        # if cache is enabled and
+        # if file pickle exist and newer than the original file
+        if (
+            not disable_cache
+            and os.path.isfile(file_pickle)
+            and os.stat(file_pickle).st_mtime > os.stat(file).st_mtime
+        ):
+            between = perf_counter()
+            self._df = pd.read_pickle(file_pickle)
+        else:
+            records: list[Any] = []
+            with open(file, mode="r", encoding="utf-8") as file_obj:
+                # map file to RAM for faster read time
+                with mmap.mmap(
+                    file_obj.fileno(), length=0, access=mmap.ACCESS_READ
+                ) as f:
+                    for line in _read_generator(f):
+                        records.append(orjson.loads(line))
+            between = perf_counter()
+            self._df = pd.DataFrame.from_records(records)
+            if not disable_cache:
+                self._df.to_pickle(file_pickle)
 
         end = perf_counter()
         if debug:
@@ -110,16 +123,18 @@ class Model:
             print("view_by_browser", end - start, "seconds")
         return docs_views_browser
 
-    def reader_profile(self, top: int = 10, debug: bool = True) -> pd.DataFrame:
+    def reader_profile(self, top: int = 10, debug: bool = False) -> pd.DataFrame:
         """
         Return the dataframe
         """
         start = perf_counter()
 
         docs_reader_profile = self._df.loc[(self._df["event_type"] == "pagereadtime")]
-        docs_reader_profile = docs_reader_profile.groupby(["visitor_uuid"])[
-            ["event_readtime"]
-        ].sum().head(top)
+        docs_reader_profile = (
+            docs_reader_profile.groupby(["visitor_uuid"])[["event_readtime"]]
+            .sum()
+            .head(top)
+        )
         docs_reader_profile = docs_reader_profile.sort_values(
             by=["event_readtime"], ascending=False
         )
@@ -148,10 +163,7 @@ class Model:
             mask = self._df["visitor_uuid"] == user_id
         else:
             mask = self._df["visitor_uuid"].isin(user_id)
-        document = self._df.loc[
-            (mask)
-            & (self._df["event_type"] == "impression")
-        ]
+        document = self._df.loc[(mask) & (self._df["event_type"] == "impression")]
         document = document.drop_duplicates(subset=["env_doc_id", "visitor_uuid"])
         return document
 
@@ -161,7 +173,7 @@ class Model:
         user_id: str,
         sort: Callable[[list[tuple[str, int]]], SortType],
         with_graph: bool = False,
-        debug: bool = True,
+        debug: bool = False,
     ) -> tuple[SortType, pd.DataFrame]:
         """
         Return list of documents the user can likes based on others reader and what they read.
@@ -175,7 +187,11 @@ class Model:
         all_documents = self._document_read_for(list(viewers_for_doc))
         reco = all_documents.value_counts(subset=["env_doc_id"])
         print(reco)
-        res_iter = [(key[0], int(reco[key[0]])) for key in reco.index if key[0] not in doc_already_read]
+        res_iter = [
+            (key[0], int(reco[key[0]]))
+            for key in reco.index
+            if key[0] not in doc_already_read
+        ]
         res_sort = sort(res_iter)
 
         end = perf_counter()
@@ -235,13 +251,22 @@ if __name__ == "__main__":
 
     # more tests
     model = Model()
-    model.load_data(os.path.join(os.path.dirname(__file__), "..", "sample_3m_lines.json"))
-    document = model._df.loc[
-        (model._df["event_type"] == "impression")
-    ]["env_doc_id"].value_counts()
+    model.load_data(
+        os.path.join(os.path.dirname(__file__), "..", "sample_3m_lines.json")
+    )
+    document = model._df.loc[(model._df["event_type"] == "impression")][
+        "env_doc_id"
+    ].value_counts()
     print(document)
 
-    sorts, graph = model.also_likes_default("121109150636-bdf13c63b3964e1494a82f6c144024e2", "d9c9f5e099ac4746")
+    sorts, graph = model.also_likes_default(
+        "121109150636-bdf13c63b3964e1494a82f6c144024e2", "d9c9f5e099ac4746"
+    )
     print(graph)
-    GraphViz.render("d9c9f5e099ac4746", "121109150636-bdf13c63b3964e1494a82f6c144024e2", sorts, graph)
+    GraphViz.render(
+        "d9c9f5e099ac4746",
+        "121109150636-bdf13c63b3964e1494a82f6c144024e2",
+        sorts,
+        graph,
+    )
     print(df)

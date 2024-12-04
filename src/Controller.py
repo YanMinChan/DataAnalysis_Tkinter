@@ -7,8 +7,8 @@ class Controller:
     def __init__(self, model: Model) -> None:
         self._model: Model = model
 
-    def load_file(self, file: str):
-        self._model.load_data(file)
+    def load_file(self, file: str, disable_cache: bool = False):
+        self._model.load_data(file, disable_cache)
 
     def reader_profile_graph(self) -> None:
         """
