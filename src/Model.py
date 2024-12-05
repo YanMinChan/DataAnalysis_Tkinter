@@ -24,10 +24,7 @@ class Model:
         self._df: pd.DataFrame = pd.DataFrame()
         pass
 
-    def load_data(self, file: str, disable_cache: bool = False, debug: bool = False):
-        start = perf_counter()
-        between = None
-
+    def load_data(self, file: str, disable_cache: bool = False):
         file_pickle = file + ".pkl"
         # if cache is enabled and
         # if file pickle exist and newer than the original file
@@ -47,88 +44,61 @@ class Model:
                 ) as f:
                     for line in _read_generator(f):
                         records.append(orjson.loads(line))
-            between = perf_counter()
             self._df = pd.DataFrame.from_records(records)
             if not disable_cache:
                 self._df.to_pickle(file_pickle)
 
-        end = perf_counter()
-        if debug:
-            print("load_data:json", between - start, "seconds")
-            print("load_data:pd", end - between, "seconds")
-
-    def view_by_country(self, doc_id: str, debug: bool = False) -> pd.DataFrame:
+    def view_by_country(self, doc_id: str) -> pd.DataFrame:
         """
         Return the dataframe
         The values are in the column "visitor_country"
         """
-        start = perf_counter()
-
         docs_views_country = self._df.loc[
             (self._df["env_doc_id"] == doc_id)
             & (self._df["event_type"] == "impression")
         ]
-
-        end = perf_counter()
-        if debug == True:
-            print("view_by_country", end - start, "seconds")
-
         return docs_views_country
 
-    def view_by_continent(self, doc_id: str, debug: bool = False) -> pd.DataFrame:
+    def view_by_continent(self, doc_id: str) -> pd.DataFrame:
         """
         Return the dataframe
         The values are in the column "continent"
         """
-        start = perf_counter()
-
         docs_views_continent = self.view_by_country(doc_id=doc_id)
+        docs_views_continent = docs_views_continent.assign(
+            continent=docs_views_continent["visitor_country"]
+        )
 
         def normalize(val: str) -> str:
             return pc.country_alpha2_to_continent_code(val)
 
-        docs_views_continent = docs_views_continent.assign(
-            continent=docs_views_continent["visitor_country"]
-        )
         docs_views_continent["continent"] = docs_views_continent["continent"].apply(
             normalize
         )
-
-        end = perf_counter()
-        if debug == True:
-            print("view_by_continent", end - start, "seconds")
         return docs_views_continent
 
-    def view_by_browser(self, debug: bool = False) -> pd.DataFrame:
+    def view_by_browser(self) -> pd.DataFrame:
         """
         Return the dataframe
         The values are in the column "browser" (normalized from the "visitor_useragent" column)
         """
-        start = perf_counter()
-
         docs_views_browser = self._df
+        docs_views_browser = docs_views_browser.assign(
+            browser=docs_views_browser["visitor_useragent"]
+        )
 
         def normalize(val: Any):
             if isinstance(val, str):
                 return "".join(val.split("/")[:1])
             return ""
 
-        docs_views_browser = docs_views_browser.assign(
-            browser=docs_views_browser["visitor_useragent"]
-        )
         docs_views_browser["browser"] = docs_views_browser["browser"].apply(normalize)
-
-        end = perf_counter()
-        if debug == True:
-            print("view_by_browser", end - start, "seconds")
         return docs_views_browser
 
-    def reader_profile(self, top: int = 10, debug: bool = False) -> pd.DataFrame:
+    def reader_profile(self, top: int = 10) -> pd.DataFrame:
         """
         Return the dataframe
         """
-        start = perf_counter()
-
         docs_reader_profile = self._df.loc[(self._df["event_type"] == "pagereadtime")]
         docs_reader_profile = (
             docs_reader_profile.groupby(["visitor_uuid"])[["event_readtime"]]
@@ -138,10 +108,6 @@ class Model:
         docs_reader_profile = docs_reader_profile.sort_values(
             by=["event_readtime"], ascending=False
         )
-
-        end = perf_counter()
-        if debug == True:
-            print("reader_profile", end - start, "seconds")
         return docs_reader_profile
 
     def _viewers_for(self, doc_id: str) -> set[str]:
@@ -171,32 +137,23 @@ class Model:
         self,
         doc_id: str,
         user_id: str,
-        sort: Callable[[list[tuple[str, int]]], SortType],
-        with_graph: bool = False,
-        debug: bool = False,
+        sort: Callable[[list[tuple[str, int]]], SortType]
     ) -> tuple[SortType, pd.DataFrame]:
         """
         Return list of documents the user can likes based on others reader and what they read.
         The sorting function take a list[tuple[doc_id, number_of_occurence]]
         The result is the result of the sort function
         """
-        start = perf_counter()
-
         viewers_for_doc = self._viewers_for(doc_id)
         doc_already_read = self._document_read_for(user_id)["env_doc_id"].unique()
         all_documents = self._document_read_for(list(viewers_for_doc))
         reco = all_documents.value_counts(subset=["env_doc_id"])
-        print(reco)
         res_iter = [
             (key[0], int(reco[key[0]]))
             for key in reco.index
             if key[0] not in doc_already_read
         ]
         res_sort = sort(res_iter)
-
-        end = perf_counter()
-        if debug:
-            print("also_likes", end - start, "seconds")
         return res_sort, all_documents
 
     @staticmethod
@@ -231,7 +188,7 @@ if __name__ == "__main__":
     import GraphViz
 
     model = Model()
-    model.load_data(os.path.join(os.path.dirname(__file__), "..", "sample_small.json"))
+    model.load_data(os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json"))
     doc_id = "120111003737-ff0d62c2f9e64064b73f058095e4f081"
     user_id = "b417fd6f88d6516d"
     df = model.view_by_country(doc_id)
@@ -252,7 +209,7 @@ if __name__ == "__main__":
     # more tests
     model = Model()
     model.load_data(
-        os.path.join(os.path.dirname(__file__), "..", "sample_3m_lines.json")
+        os.path.join(os.path.dirname(__file__), "..", "samples", "sample_3m_lines.json")
     )
     document = model._df.loc[(model._df["event_type"] == "impression")][
         "env_doc_id"

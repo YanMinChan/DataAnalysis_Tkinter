@@ -1,3 +1,3 @@
 #!/bin/sh
-pyinstaller --onefile src/f21sc_cw2.py
-cp dist/f21sc_cw2 .
+pyinstaller --onefile src/f21sccw2.py
+cp dist/f21sccw2 .

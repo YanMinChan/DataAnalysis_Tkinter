@@ -123,7 +123,7 @@ if __name__ == "__main__":
     import os
 
     cnt = Controller(Model())
-    cnt.load_file(os.path.join(os.path.dirname(__file__), "..", "sample_small.json"))
+    cnt.load_file(os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json"))
     cnt.reader_profile_graph()
     res = cnt.reader_profile_text()
     print(res)

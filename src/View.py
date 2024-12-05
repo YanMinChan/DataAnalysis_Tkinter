@@ -293,6 +293,6 @@ if __name__ == "__main__":
 
     mdl = Model()
     cnt = Controller(mdl)
-    cnt.load_file(os.path.join(os.path.dirname(__file__), "..", "sample_small.json"))
+    cnt.load_file(os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json"))
     win = Window(cnt)
     win.mainloop()

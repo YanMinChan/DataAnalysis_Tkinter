@@ -5,3 +5,5 @@ __pycache__
 /f21sc_cw2
 also_likes.gv
 also_likes.gv.pdf
+*.egg-info
+*.pkl
