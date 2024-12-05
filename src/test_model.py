@@ -140,16 +140,15 @@ class ModelTest(unittest.TestCase):
         del mdl
 
         mdl = Model.Model()
-        mdl.load_data(SAMPLES[2])
+        mdl.load_data(SAMPLES[3])
         doc_id = "121109150636-bdf13c63b3964e1494a82f6c144024e2"
         user_id = "d9c9f5e099ac4746"
         start = perf_counter()
         lst, _ = mdl.also_likes(doc_id, user_id, Model.Model.sort_show_weight)
-        print(f"test_also_likes_default:[{SAMPLES[1][-25:]}] d:[{doc_id[-10:]}]u:[{user_id[-10:]}]: {perf_counter() - start} seconds")
+        print(f"test_also_likes_default:[{SAMPLES[3][-25:]}] d:[{doc_id[-10:]}]u:[{user_id[-10:]}]: {perf_counter() - start} seconds")
         expected = {
             "130121141937-243485ed0f9644ea8f54791e08297226": 1,
             "130516043301-2137d0ab4a87495dbe6f510bd3ed4aa5": 1,
-            "121109150636-bdf13c63b3964e1494a82f6c144024e2": 17,
         }
         for i_doc, i_value in lst:
             self.assertIn(i_doc, expected.keys())
