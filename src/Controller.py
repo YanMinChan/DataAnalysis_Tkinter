@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import GraphViz
 from Model import Model
 
 
@@ -80,17 +81,20 @@ class Controller:
         ax.set_title("Views by browser")
         fig.show()
 
-    def also_like_text(self, docID: str, userID: str) -> str:
+    def also_like_text(self, docID: str, userID: str, top: int = 10) -> str:
         likes, _ = self._model.also_likes(
             doc_id=docID, user_id=userID, sort=Model.sort_show_weight
         )
         text = ""
-        for item in likes:
+        for item in likes[:top]:
             text += f"- {item[0]} : {item[1]}\n"
         return text
 
-    def also_like_graph(self, docID: str, userID: str) -> str:
-        pass
+    def also_like_graph(self, docID: str, userID: str, top: int = 10):
+        _, graph = self._model.also_likes(
+            doc_id=docID, user_id=userID, sort=Model.sort_show_weight
+        )
+        GraphViz.render(user_id=userID, doc_id=docID, graph=graph)
 
     def view_by_country_graph(self, docID: str):
         countries = self._model.view_by_country(doc_id=docID)["visitor_country"]
@@ -121,5 +125,6 @@ if __name__ == "__main__":
     cnt = Controller(Model())
     cnt.load_file(os.path.join(os.path.dirname(__file__), "..", "sample_small.json"))
     cnt.reader_profile_graph()
-    cnt.reader_profile_text()
+    res = cnt.reader_profile_text()
+    print(res)
     _ = input()

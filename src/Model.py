@@ -266,7 +266,6 @@ if __name__ == "__main__":
     GraphViz.render(
         "d9c9f5e099ac4746",
         "121109150636-bdf13c63b3964e1494a82f6c144024e2",
-        sorts,
         graph,
     )
     print(df)

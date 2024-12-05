@@ -2,7 +2,7 @@ import graphviz
 import pandas as pd
 
 
-def render(user_id: str, doc_id: str, docs: list[tuple[str, int]], graph: pd.DataFrame):
+def render(user_id: str, doc_id: str, graph: pd.DataFrame):
     g = graphviz.Digraph("also_likes", filename="also_likes.gv")
 
     g.node(user_id[-4:], user_id[-4:], style="filled", fillcolor="green")

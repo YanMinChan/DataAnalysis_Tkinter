@@ -99,14 +99,14 @@ def main() -> int:
             "args": [],
         },
         "5d": {
-            True: cnt.also_like_graph,
+            True: cnt.also_like_text,
             False: cnt.also_like_text,
             "args": [doc_uuid, user_uuid],
         },
-        "6": {  # TODO
-            True: None,
-            False: None,
-            "args": [],
+        "6": {
+            True: cnt.also_like_graph,
+            False: cnt.also_like_graph,
+            "args": [doc_uuid, user_uuid],
         },
         "7": {
             True: gui_app,
