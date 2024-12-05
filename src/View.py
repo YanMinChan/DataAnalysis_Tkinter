@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename
 from typing import override
 from Controller import Controller
@@ -210,19 +211,24 @@ class ReaderProfiles(PopUp):
 
         # GUI column design
         _ = self.columnconfigure(0, weight=1)
-        _ = self.columnconfigure(1, weight=4)
+        _ = self.columnconfigure(1, weight=1)
 
-        self.text: tk.Text = tk.Text(self)
-        self.text.insert(tk.INSERT, "")
-        self.text.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
-
-        btn_text = tk.Button(self, text="Ok", command=self.on_btn_text_clicked)
-        btn_text.grid(row=1, column=1, ipadx=10, pady=5)
+        btn_text = tk.Button(self, text="Render", command=self.on_btn_text_clicked)
+        btn_text.grid(row=0, column=0, ipadx=10, pady=5, sticky=tk.EW)
 
         btn_graph = tk.Button(
             self, text="Generate graph", command=self.on_btn_graph_clicked
         )
-        btn_graph.grid(row=2, column=1, ipadx=10, pady=5)
+        btn_graph.grid(row=0, column=1, ipadx=10, pady=5, sticky=tk.EW)
+
+        self.text: tk.Text = tk.Text(self, height=10)
+        self.text.insert(tk.INSERT, "")
+        self.text.grid(row=1, column=0, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
+
+        # create a Scrollbar and associate it with txt
+        scrollb = ttk.Scrollbar(self, command=self.text.yview)
+        scrollb.grid(row=1, column=2, sticky=tk.NSEW)
+        self.text['yscrollcommand'] = scrollb.set
 
     def on_btn_text_clicked(self):
         s = self.window.cnt.reader_profile_text()
@@ -244,7 +250,7 @@ class AlsoLikes(PopUp):
 
         # GUI column design
         _ = self.columnconfigure(0, weight=1)
-        _ = self.columnconfigure(1, weight=4)
+        _ = self.columnconfigure(1, weight=1)
 
         # The input boxes
         label = tk.Label(self, text="Document UUID")
@@ -261,27 +267,34 @@ class AlsoLikes(PopUp):
 
         # The buttons
         also_likes_button = tk.Button(
-            self, text="Ok", command=self.also_like_clicked_text
+            self, text="Render", command=self.also_like_clicked_text
         )
-        also_likes_button.grid(row=2, column=1, ipadx=10, pady=5)
+        also_likes_button.grid(row=2, column=0, ipadx=10, pady=5)
         also_likes_generate_graph = tk.Button(
-            self, text="Generate graph", command="also_likes_generate_graph_clicked"
+            self, text="Generate graph", command=self.also_likes_generate_graph_clicked
         )
-        also_likes_generate_graph.grid(row=3, column=1, ipadx=10, pady=5)
+        also_likes_generate_graph.grid(row=2, column=1, ipadx=10, pady=5)
 
         # Textbox
-        self.text = tk.Text(self)
+        self.text = tk.Text(self, height=10)
         self.text.insert(tk.INSERT, "")
-        self.text.grid(row=4, column=0, sticky=tk.W, padx=5, pady=5)
+        self.text.grid(row=3, column=0, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
+
+        # create a Scrollbar and associate it with txt
+        scrollb = ttk.Scrollbar(self, command=self.text.yview)
+        scrollb.grid(row=3, column=2, sticky=tk.NSEW)
+        self.text['yscrollcommand'] = scrollb.set
 
     def also_like_clicked_text(self):
-        print("It worked!")
         s = self.window.cnt.also_like_text(
             docID=self.docID.get(), userID=self.userID.get()
         )
         self.text.delete("1.0", tk.END)
         self.text.insert(tk.INSERT, s)
         self.text.update()
+
+    def also_likes_generate_graph_clicked(self):
+        self.window.cnt.also_like_graph(docID=self.docID.get(), userID=self.userID.get())
 
     @override
     def go_to(self):
