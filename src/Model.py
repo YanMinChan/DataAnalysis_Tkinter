@@ -92,8 +92,8 @@ class Model:
 
         def normalize(val: Any):
             if isinstance(val, str):
-                return "".join(val.split("/")[:1])
-            return ""
+                return "".join(val.split("/")[:1]).strip('"')
+            return "Unknown"
 
         docs_views_browser["browser"] = docs_views_browser["browser"].apply(normalize)
         return docs_views_browser
