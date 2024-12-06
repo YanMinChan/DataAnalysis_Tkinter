@@ -74,11 +74,11 @@ class Controller:
         # occurrence for different "event_type" not implemented yet
         browsers = self._model.view_by_browser(event_type=event_type)["browser"]
         values = [float(y) for y in browsers.value_counts().values]
-        labels = [label for label in browsers.value_counts().index]
+        labels = [label[:20] for label in browsers.value_counts().index]
         fig, ax = plt.subplots()
         ax.bar(height=values, x=labels)
         ax.set_xlabel("Main browser")
-        ax.tick_params('x', rotation=45)
+        ax.tick_params('x', labelsize=8, rotation=90)
         ax.set_ylabel("Total number of occurrences")
         ax.set_title("Views by main browser (event_type=\"" + event_type + "\")")
         fig.show()

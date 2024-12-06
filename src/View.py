@@ -28,9 +28,9 @@ class Window(tk.Tk):
         menu = tk.Menu(self)
         menu_i = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Features", menu=menu_i)
+        menu.add_command(label="Load File", command=self.on_btn_load_file)
 
         for f in (
-            BlankPage,
             ViewByCountryPage,
             ViewByContinentPage,
             ViewByBrowser,
@@ -44,11 +44,15 @@ class Window(tk.Tk):
                 label=self.frames[f].page_name, command=self.frames[f].go_to
             )
 
-        self.select_frame(BlankPage)
+        self.select_frame(AlsoLikes)
         _ = self.config(menu=menu)
 
     def select_frame(self, frame: type):
         self.frames[frame].tkraise()
+
+    def on_btn_load_file(self):
+        file = askopenfilename(defaultextension=".json")
+        self.cnt.load_file(file)
 
 
 class PopUp(tk.Frame):
@@ -64,20 +68,20 @@ class PopUp(tk.Frame):
         self.window.title(self.page_name)
 
 
-# The Home page (blank)
-class BlankPage(PopUp):
-    def __init__(self, parent: tk.Frame, window: Window):
-        super().__init__(parent, window, "Home")
-        btn = tk.Button(self, text="Load File", command=self.on_btn_load_file)
-        btn.grid(row=0, column=0)
+# # The Home page (blank)
+# class BlankPage(PopUp):
+#     def __init__(self, parent: tk.Frame, window: Window):
+#         super().__init__(parent, window, "Home")
+#         btn = tk.Button(self, text="Load File", command=self.on_btn_load_file)
+#         btn.grid(row=0, column=0)
 
-    def on_btn_load_file(self):
-        file = askopenfilename(defaultextension=".json")
-        self.window.cnt.load_file(file)
+#     def on_btn_load_file(self):
+#         file = askopenfilename(defaultextension=".json")
+#         self.window.cnt.load_file(file)
 
-    @override
-    def go_to(self):
-        super().go_to()
+#     @override
+#     def go_to(self):
+#         super().go_to()
 
 
 # The view by country page
