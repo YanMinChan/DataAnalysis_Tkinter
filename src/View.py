@@ -163,7 +163,7 @@ class ViewByBrowser(PopUp):
             try:
                 options = (
                     self.window.cnt._model.event_type_unique()
-                )  # Kinda weird but stay like this first
+                )
             except ValueError as error:
                 print(f"F21SCCW2: error: {error}", file=sys.stderr)
                 _ = showerror("Model error", str(error))
@@ -212,7 +212,7 @@ class ViewByMainBrowser(PopUp):
             try:
                 options = (
                     self.window.cnt._model.event_type_unique()
-                )  # Kinda weird but stay like this first
+                )
             except ValueError as error:
                 print(f"F21SCCW2: error: {error}", file=sys.stderr)
                 _ = showerror("Model error", str(error))

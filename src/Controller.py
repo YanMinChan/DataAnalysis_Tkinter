@@ -47,7 +47,6 @@ class Controller:
         """
         Return a bar plot of the number of occurrences of each main browsers
         """
-        # occurrence for different "event_type" not implemented yet
         browsers = self._model.view_by_browser(event_type=event_type)[
             "visitor_useragent"
         ]
@@ -58,7 +57,7 @@ class Controller:
         fig, ax = plt.subplots()
         ax.bar(height=values, x=labels)
         ax.set_xlabel("Browser")
-        ax.tick_params("x", labelsize=4, rotation=45)  # avoid label overcrowding
+        ax.tick_params("x", labelsize=4, rotation=90)  # avoid label overcrowding
         ax.set_ylabel("Total number of occurrences")
         ax.set_title('Views by browser (event_type="' + event_type + '")')
         fig.show()
@@ -75,7 +74,6 @@ class Controller:
         """
         Return a bar plot of the number of occurrences of each main browsers
         """
-        # occurrence for different "event_type" not implemented yet
         browsers = self._model.view_by_browser(event_type=event_type)["browser"]
         values = [float(y) for y in browsers.value_counts().values]
         labels = [label[:20] for label in browsers.value_counts().index]
