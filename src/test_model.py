@@ -42,9 +42,12 @@ class ModelTest(unittest.TestCase):
         expected = {
             "US": 30
         }
+        nb = 0
         for i in df_count.index:
             self.assertIn(i, expected.keys())
             self.assertEqual(df_count[i], expected[i])
+            nb += 1
+        self.assertEqual(nb, len(expected))
 
         doc_id = "140103105022-d0c7d706a1df5106cf88686fb67092ed"
         start = perf_counter()
@@ -54,9 +57,12 @@ class ModelTest(unittest.TestCase):
         expected = {
             "MA": 6
         }
+        nb = 0
         for i in df_count.index:
             self.assertIn(i, expected.keys())
             self.assertEqual(df_count[i], expected[i])
+            nb += 1
+        self.assertEqual(nb, len(expected))
 
     def test_view_by_continent(self):
         mdl = Model.Model()
@@ -70,9 +76,12 @@ class ModelTest(unittest.TestCase):
         expected = {
             "NA": 30
         }
+        nb = 0
         for i in df_count.index:
             self.assertIn(i, expected.keys())
             self.assertEqual(df_count[i], expected[i])
+            nb += 1
+        self.assertEqual(nb, len(expected))
 
         doc_id = "140103105022-d0c7d706a1df5106cf88686fb67092ed"
         start = perf_counter()
@@ -82,9 +91,12 @@ class ModelTest(unittest.TestCase):
         expected = {
             "AF": 6
         }
+        nb = 0
         for i in df_count.index:
             self.assertIn(i, expected.keys())
             self.assertEqual(df_count[i], expected[i])
+            nb += 1
+        self.assertEqual(nb, len(expected))
 
     def test_view_by_browser(self):
         mdl = Model.Model()
@@ -100,9 +112,12 @@ class ModelTest(unittest.TestCase):
             "Dalvik": 5,
             "UCWEB": 1,
         }
+        nb = 0
         for i in df_count.index:
             self.assertIn(i, expected.keys())
             self.assertEqual(df_count[i], expected[i])
+            nb += 1
+        self.assertEqual(nb, len(expected))
 
     def test_reader_profile(self):
         mdl = Model.Model()
@@ -123,9 +138,12 @@ class ModelTest(unittest.TestCase):
             "0508626e498eee5d":          3072.0,
             "017bb7e3f878977d":          1648.0,
         }
+        nb = 0
         for i, i_value in zip(df.index, df["event_readtime"]):
             self.assertIn(i, expected.keys())
             self.assertEqual(i_value, expected[i])
+            nb += 1
+        self.assertEqual(nb, len(expected))
 
     def test_also_likes_default(self):
         mdl = Model.Model()
@@ -150,9 +168,12 @@ class ModelTest(unittest.TestCase):
             "130121141937-243485ed0f9644ea8f54791e08297226": 1,
             "130516043301-2137d0ab4a87495dbe6f510bd3ed4aa5": 1,
         }
+        nb = 0
         for i_doc, i_value in lst:
             self.assertIn(i_doc, expected.keys())
             self.assertEqual(i_value, expected[i_doc])
+            nb += 1
+        self.assertEqual(nb, len(expected))
 
 
 if __name__ == "__main__":
