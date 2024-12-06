@@ -91,7 +91,7 @@ class ModelTest(unittest.TestCase):
         mdl.load_data(SAMPLES[1])
 
         start = perf_counter()
-        df = mdl.view_by_browser()
+        df = mdl.view_by_browser("all")
         df_count = df["browser"].value_counts()
         print(f"test_view_by_browser:[{SAMPLES[1][-25:]}]: {perf_counter() - start} seconds")
         expected = {
