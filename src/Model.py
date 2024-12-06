@@ -52,6 +52,8 @@ class Model:
         Return the dataframe
         The values are in the column "visitor_country"
         """
+        if "env_doc_id" not in self._df.columns or "event_type" not in self._df.columns:
+            raise ValueError("File is not loaded.")
         docs_views_country = self._df.loc[
             (self._df["env_doc_id"] == doc_id)
             & (self._df["event_type"] == "impression")
@@ -63,6 +65,8 @@ class Model:
         Return the dataframe
         The values are in the column "continent"
         """
+        if "visitor_country" not in self._df.columns:
+            raise ValueError("File is not loaded.")
         docs_views_continent = self.view_by_country(doc_id=doc_id)
         docs_views_continent = docs_views_continent.assign(
             continent=docs_views_continent["visitor_country"]
@@ -81,8 +85,10 @@ class Model:
         Return the dataframe
         The values are in the column "browser" (normalized from the "visitor_useragent" column)
         """
+        if "event_type" not in self._df.columns or "visitor_useragent" not in self._df.columns:
+            raise ValueError("File is not loaded.")
         docs_views_browser = self._df
-        if not event_type == "all":
+        if event_type != "all":
             docs_views_browser = self._df.loc[(self._df["event_type"] == event_type)]
         docs_views_browser = docs_views_browser.assign(
             browser=docs_views_browser["visitor_useragent"]
@@ -100,6 +106,8 @@ class Model:
         """
         Return the dataframe
         """
+        if "visitor_uuid" not in self._df.columns or "event_type" not in self._df.columns or "event_readtime" not in self._df.columns:
+            raise ValueError("File is not loaded.")
         docs_reader_profile = self._df.loc[(self._df["event_type"] == "pagereadtime")]
         docs_reader_profile = (
             docs_reader_profile.groupby(["visitor_uuid"])[["event_readtime"]]
@@ -115,6 +123,8 @@ class Model:
         """
         Return the list of viewer for a document
         """
+        if "env_doc_id" not in self._df.columns or "event_type" not in self._df.columns or "visitor_uuid" not in self._df.columns:
+            raise ValueError("File is not loaded.")
         viewers = self._df.loc[
             (self._df["env_doc_id"] == doc_id)
             & (self._df["event_type"] == "impression")
@@ -125,6 +135,8 @@ class Model:
         """
         Return the list of document read by a user
         """
+        if "visitor_uuid" not in self._df.columns or "event_type" not in self._df.columns or "env_doc_id" not in self._df.columns:
+            raise ValueError("File is not loaded.")
         mask = None
         if isinstance(user_id, str):
             mask = self._df["visitor_uuid"] == user_id
@@ -184,6 +196,8 @@ class Model:
         """
         Return a list of "event_type"
         """
+        if "event_type" not in self._df.columns:
+            raise ValueError("File is not loaded.")
         evt: list[str] = list(self._df["event_type"].unique())
         evt.append("all")
         return evt

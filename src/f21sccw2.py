@@ -128,12 +128,16 @@ def main() -> int:
         return 1
     cnt.load_file(file.name, disable_cache)
 
-    s = action_task_fn(
-        *action_task["args"]  # pyright: ignore[reportCallIssue, reportArgumentType]
-    )
-    if s is not None:
-        s = f"{s}"
-        print(s)
+    try:
+        s = action_task_fn(
+            *action_task["args"]  # pyright: ignore[reportCallIssue, reportArgumentType]
+        )
+    except ValueError as error:
+        print(f"F21SCCW2: error: {error}", file=sys.stderr)
+    else:
+        if s is not None:
+            s = f"{s}"
+            print(s)
     return 0
 
 
