@@ -175,7 +175,7 @@ class ViewByMainBrowser(PopUp):
         # The menu of event type
         label = tk.Label(self, text="Event type")
         label.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
-        self.event_name = tk.StringVar()
+        self.event_name: tk.StringVar = tk.StringVar()
 
         # The buttons
         view_by_main_browser_button = tk.Button(
@@ -268,7 +268,7 @@ class AlsoLikes(PopUp):
         also_likes_generate_graph.grid(row=2, column=1, ipadx=10, pady=5)
 
         # Textbox
-        self.text = tk.Text(self, height=10)
+        self.text: tk.Text = tk.Text(self, height=10)
         self.text.insert(tk.INSERT, "")
         self.text.grid(row=3, column=0, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
 

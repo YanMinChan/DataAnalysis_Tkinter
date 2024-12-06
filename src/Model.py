@@ -1,10 +1,9 @@
-import itertools
 import orjson
 import mmap
 import os
-from typing import Any, Callable, Generator, TypeVar
+from typing import Any, Callable, TypeVar
+from collections.abc import Generator
 import pandas as pd
-import numpy as np
 import pycountry_convert as pc
 from time import perf_counter
 
@@ -34,7 +33,6 @@ class Model:
             and os.path.isfile(file_pickle)
             and os.stat(file_pickle).st_mtime > os.stat(file).st_mtime
         ):
-            between = perf_counter()
             self._df = pd.read_pickle(file_pickle)
         else:
             records: list[Any] = []
@@ -182,11 +180,11 @@ class Model:
         """
         return self.also_likes(doc_id, user_id, Model.sort_default)
 
-    def event_type_unique(self) -> set[str]:
+    def event_type_unique(self) -> list[str]:
         """
         Return a list of "event_type"
         """
-        evt = list(self._df["event_type"].unique())
+        evt: list[str] = list(self._df["event_type"].unique())
         evt.append("all")
         return evt
 
