@@ -140,7 +140,7 @@ class Model:
         self,
         doc_id: str,
         user_id: str,
-        sort: Callable[[list[tuple[str, int]]], SortType]
+        sort: Callable[[list[tuple[str, int]], int], SortType]
     ) -> tuple[SortType, pd.DataFrame]:
         """
         Return list of documents the user can likes based on others reader and what they read.
@@ -160,18 +160,18 @@ class Model:
         return res_sort, all_documents
 
     @staticmethod
-    def sort_default(docs: list[tuple[str, int]]) -> list[str]:
+    def sort_default(docs: list[tuple[str, int]], top: int = 10) -> list[str]:
         """
         Return a list of document sorted by the number of occurence
         The return is list[str]
         """
         sorted_by_cross_view = Model.sort_show_weight(docs)
-        return [z[0] for z in sorted_by_cross_view]
+        return [z[0] for z in sorted_by_cross_view][:top]
 
     @staticmethod
-    def sort_show_weight(docs: list[tuple[str, int]]) -> list[tuple[str, int]]:
+    def sort_show_weight(docs: list[tuple[str, int]], top: int = 10) -> list[tuple[str, int]]:
         sorted_by_cross_view = sorted(docs, key=lambda y: y[1], reverse=True)
-        return sorted_by_cross_view
+        return sorted_by_cross_view[:top]
 
     def also_likes_default(self, doc_id: str, user_id: str):
         """
