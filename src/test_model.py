@@ -190,6 +190,15 @@ class ModelTest(unittest.TestCase):
             nb += 1
         self.assertEqual(nb, len(expected))
 
+    def test_crash(self):
+        mdl = Model.Model()
+        try:
+            _ = mdl.reader_profile()
+        except ValueError:
+            self.assertTrue(True)
+        else:
+            self.assertTrue(False)
+
 
 if __name__ == "__main__":
     _ = unittest.main()
