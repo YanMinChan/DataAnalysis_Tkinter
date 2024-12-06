@@ -48,15 +48,19 @@ class Controller:
         Return a bar plot of the number of occurrences of each main browsers
         """
         # occurrence for different "event_type" not implemented yet
-        browsers = self._model.view_by_browser(event_type=event_type)["visitor_useragent"]
+        browsers = self._model.view_by_browser(event_type=event_type)[
+            "visitor_useragent"
+        ]
         values = [float(y) for y in browsers.value_counts().values]
-        labels = [label[:20] for label in browsers.value_counts().index] # cut short the label length to 20 char
+        labels = [
+            label[:20] for label in browsers.value_counts().index
+        ]  # cut short the label length to 20 char
         fig, ax = plt.subplots()
         ax.bar(height=values, x=labels)
         ax.set_xlabel("Browser")
-        ax.tick_params('x', labelsize=4, rotation=45) # avoid label overcrowding
+        ax.tick_params("x", labelsize=4, rotation=45)  # avoid label overcrowding
         ax.set_ylabel("Total number of occurrences")
-        ax.set_title("Views by browser (event_type=\"" + event_type + "\")")
+        ax.set_title('Views by browser (event_type="' + event_type + '")')
         fig.show()
 
     def view_by_browser_text(self, event_type: str) -> str:
@@ -78,9 +82,9 @@ class Controller:
         fig, ax = plt.subplots()
         ax.bar(height=values, x=labels)
         ax.set_xlabel("Main browser")
-        ax.tick_params('x', labelsize=8, rotation=90)
+        ax.tick_params("x", labelsize=8, rotation=90)
         ax.set_ylabel("Total number of occurrences")
-        ax.set_title("Views by main browser (event_type=\"" + event_type + "\")")
+        ax.set_title('Views by main browser (event_type="' + event_type + '")')
         fig.show()
 
     def also_like_text(self, docID: str, userID: str, top: int = 10) -> str:
@@ -125,7 +129,9 @@ if __name__ == "__main__":
     import os
 
     cnt = Controller(Model())
-    cnt.load_file(os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json"))
+    cnt.load_file(
+        os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json")
+    )
     cnt.reader_profile_graph()
     res = cnt.reader_profile_text()
     print(res)

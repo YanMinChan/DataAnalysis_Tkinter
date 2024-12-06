@@ -140,7 +140,7 @@ class Model:
         self,
         doc_id: str,
         user_id: str,
-        sort: Callable[[list[tuple[str, int]], int], SortType]
+        sort: Callable[[list[tuple[str, int]], int], SortType],
     ) -> tuple[SortType, pd.DataFrame]:
         """
         Return list of documents the user can likes based on others reader and what they read.
@@ -170,7 +170,9 @@ class Model:
         return [z[0] for z in sorted_by_cross_view][:top]
 
     @staticmethod
-    def sort_show_weight(docs: list[tuple[str, int]], top: int = 10) -> list[tuple[str, int]]:
+    def sort_show_weight(
+        docs: list[tuple[str, int]], top: int = 10
+    ) -> list[tuple[str, int]]:
         sorted_by_cross_view = sorted(docs, key=lambda y: y[1], reverse=True)
         return sorted_by_cross_view[:top]
 
@@ -194,7 +196,9 @@ if __name__ == "__main__":
     import GraphViz
 
     model = Model()
-    model.load_data(os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json"))
+    model.load_data(
+        os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json")
+    )
     doc_id = "120111003737-ff0d62c2f9e64064b73f058095e4f081"
     user_id = "b417fd6f88d6516d"
     df = model.view_by_country(doc_id)

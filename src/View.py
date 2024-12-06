@@ -52,7 +52,8 @@ class Window(tk.Tk):
 
     def on_btn_load_file(self):
         file = askopenfilename(defaultextension=".json")
-        self.cnt.load_file(file)
+        if isinstance(file, str):  # pyright: ignore[reportUnnecessaryIsInstance]
+            self.cnt.load_file(file)
 
 
 class PopUp(tk.Frame):
@@ -66,6 +67,7 @@ class PopUp(tk.Frame):
     def go_to(self):
         self.window.select_frame(type(self))
         self.window.title(self.page_name)
+
 
 # The view by country page
 class ViewByCountryPage(PopUp):
@@ -218,7 +220,7 @@ class ReaderProfiles(PopUp):
         # create a Scrollbar and associate it with txt
         scrollb = ttk.Scrollbar(self, command=self.text.yview)
         scrollb.grid(row=1, column=2, sticky=tk.NSEW)
-        self.text['yscrollcommand'] = scrollb.set
+        self.text["yscrollcommand"] = scrollb.set
 
     def on_btn_text_clicked(self):
         s = self.window.cnt.reader_profile_text()
@@ -273,7 +275,7 @@ class AlsoLikes(PopUp):
         # create a Scrollbar and associate it with txt
         scrollb = ttk.Scrollbar(self, command=self.text.yview)
         scrollb.grid(row=3, column=2, sticky=tk.NSEW)
-        self.text['yscrollcommand'] = scrollb.set
+        self.text["yscrollcommand"] = scrollb.set
 
     def also_like_clicked_text(self):
         s = self.window.cnt.also_like_text(
@@ -284,7 +286,9 @@ class AlsoLikes(PopUp):
         self.text.update()
 
     def also_likes_generate_graph_clicked(self):
-        self.window.cnt.also_like_graph(docID=self.docID.get(), userID=self.userID.get())
+        self.window.cnt.also_like_graph(
+            docID=self.docID.get(), userID=self.userID.get()
+        )
 
     @override
     def go_to(self):
@@ -296,6 +300,8 @@ if __name__ == "__main__":
 
     mdl = Model()
     cnt = Controller(mdl)
-    cnt.load_file(os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json"))
+    cnt.load_file(
+        os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json")
+    )
     win = Window(cnt)
     win.mainloop()
