@@ -12,7 +12,7 @@ Python External Library
 - "pycountry-convert>=0.7.2"
 - tkinter
 
-To install them, either use pip
+To install them, either use pip (don't forget to create a [virtual environment](https://docs.python.org/3/library/venv.html))
 ```bash
 pip install -r ./requirements.txt
 ```
