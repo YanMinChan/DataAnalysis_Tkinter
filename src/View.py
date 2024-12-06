@@ -15,7 +15,7 @@ class Window(tk.Tk):
     ):
         self.cnt: Controller = controller
         super().__init__(*args, **kwargs)  # pyright: ignore[reportUnknownArgumentType]
-        self.title("Home")
+        self.title("Also Likes")
         self.geometry("340x200")
 
         container = tk.Frame(self)
@@ -66,23 +66,6 @@ class PopUp(tk.Frame):
     def go_to(self):
         self.window.select_frame(type(self))
         self.window.title(self.page_name)
-
-
-# # The Home page (blank)
-# class BlankPage(PopUp):
-#     def __init__(self, parent: tk.Frame, window: Window):
-#         super().__init__(parent, window, "Home")
-#         btn = tk.Button(self, text="Load File", command=self.on_btn_load_file)
-#         btn.grid(row=0, column=0)
-
-#     def on_btn_load_file(self):
-#         file = askopenfilename(defaultextension=".json")
-#         self.window.cnt.load_file(file)
-
-#     @override
-#     def go_to(self):
-#         super().go_to()
-
 
 # The view by country page
 class ViewByCountryPage(PopUp):
