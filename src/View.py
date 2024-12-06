@@ -155,9 +155,12 @@ class ViewByBrowser(PopUp):
 
         # The buttons
         view_by_browser_button = tk.Button(
-            self, text="Ok", command="view_by_browser_clicked"
+            self, text="Ok", command=self.view_by_browser_clicked
         )
         view_by_browser_button.grid(row=1, column=1, ipadx=10, pady=5)
+
+    def view_by_browser_clicked(self):
+        self.window.cnt.view_by_full_browser_graph(event_type=self.event_name.get())
 
     @override
     def go_to(self):
@@ -192,7 +195,7 @@ class ViewByMainBrowser(PopUp):
         view_by_main_browser_button.grid(row=1, column=1, ipadx=10, pady=5)
 
     def view_by_main_browser_clicked(self):
-        self.window.cnt.view_by_browser_graph(event_type=self.event_name)
+        self.window.cnt.view_by_browser_graph(event_type=self.event_name.get())
 
     @override
     def go_to(self):

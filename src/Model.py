@@ -4,6 +4,7 @@ import mmap
 import os
 from typing import Any, Callable, Generator, TypeVar
 import pandas as pd
+import numpy as np
 import pycountry_convert as pc
 from time import perf_counter
 
@@ -77,12 +78,14 @@ class Model:
         )
         return docs_views_continent
 
-    def view_by_browser(self) -> pd.DataFrame:
+    def view_by_browser(self, event_type: str) -> pd.DataFrame:
         """
         Return the dataframe
         The values are in the column "browser" (normalized from the "visitor_useragent" column)
         """
         docs_views_browser = self._df
+        if not event_type == "all":
+            docs_views_browser = self._df.loc[(self._df["event_type"] == event_type)]
         docs_views_browser = docs_views_browser.assign(
             browser=docs_views_browser["visitor_useragent"]
         )
@@ -180,7 +183,9 @@ class Model:
         """
         Return a list of "event_type"
         """
-        return set(self._df["event_type"].unique())
+        evt = list(self._df["event_type"].unique())
+        evt.append("all")
+        return evt
 
 
 if __name__ == "__main__":
