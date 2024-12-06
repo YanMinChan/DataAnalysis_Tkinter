@@ -217,12 +217,12 @@ class ReaderProfiles(PopUp):
         _ = self.columnconfigure(1, weight=1)
 
         btn_text = tk.Button(self, text="Render", command=self.on_btn_text_clicked)
-        btn_text.grid(row=0, column=0, ipadx=10, pady=5, sticky=tk.EW)
+        btn_text.grid(row=0, column=0, ipadx=10, pady=5)
 
         btn_graph = tk.Button(
             self, text="Generate graph", command=self.on_btn_graph_clicked
         )
-        btn_graph.grid(row=0, column=1, ipadx=10, pady=5, sticky=tk.EW)
+        btn_graph.grid(row=0, column=1, ipadx=10, pady=5)
 
         self.text: tk.Text = tk.Text(self, height=10)
         self.text.insert(tk.INSERT, "")
