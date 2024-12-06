@@ -146,6 +146,7 @@ class Model:
         Return list of documents the user can likes based on others reader and what they read.
         The sorting function take a list[tuple[doc_id, number_of_occurence]]
         The result is the result of the sort function
+        and the dataframe with all documents read by viewser of the given document
         """
         viewers_for_doc = self._viewers_for(doc_id)
         doc_already_read = self._document_read_for(user_id)["env_doc_id"].unique()
@@ -175,7 +176,7 @@ class Model:
 
     def also_likes_default(self, doc_id: str, user_id: str):
         """
-        Same as ModelV2.also_likes with the ModelV2.sort_default as sort function
+        Same as Model.also_likes with the Model.sort_default as sort function
         """
         return self.also_likes(doc_id, user_id, Model.sort_default)
 
