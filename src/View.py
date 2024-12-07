@@ -1,6 +1,6 @@
 import sys
 import tkinter as tk
-from tkinter.messagebox import showerror
+from tkinter.messagebox import showerror, showinfo
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename
 from typing import override
@@ -56,6 +56,7 @@ class Window(tk.Tk):
         file = askopenfilename(defaultextension=".json")
         if isinstance(file, str):  # pyright: ignore[reportUnnecessaryIsInstance]
             self.cnt.load_file(file)
+            _ = showinfo("File Loaded")
 
 
 class PopUp(tk.Frame):
