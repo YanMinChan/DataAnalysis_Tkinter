@@ -74,24 +74,24 @@ def main() -> int:
 
     actions = {
         "2a": {
-            True: cnt.view_by_continent_graph,
-            False: None,
+            True: cnt.view_by_country_graph,
+            False: cnt.view_by_country_text,
             "args": [doc_uuid],
         },
         "2b": {
             True: cnt.view_by_continent_graph,
-            False: None,
+            False: cnt.view_by_continent_text,
             "args": [doc_uuid],
         },
         "3a": {
             True: cnt.view_by_full_browser_graph,
             False: cnt.view_by_full_browser_text,
-            "args": [""],  # TODO: event type
+            "args": ["all"],  # TODO: event type
         },
         "3b": {
             True: cnt.view_by_browser_graph,
             False: cnt.view_by_browser_text,
-            "args": [""],  # TODO: event type
+            "args": ["all"],  # TODO: event type
         },
         "4": {
             True: cnt.reader_profile_graph,

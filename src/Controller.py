@@ -111,6 +111,10 @@ class Controller:
         ax.set_title("Views by country of document " + "*" + docID[-4:])
         fig.show()
 
+    def view_by_country_text(self, docID: str):
+        countries = self._model.view_by_country(doc_id=docID)["visitor_country"]
+        return countries.value_counts().to_string()
+
     def view_by_continent_graph(self, docID: str):
         continents = self._model.view_by_continent(doc_id=docID)["continent"]
         values = [float(y) for y in continents.value_counts().values]
@@ -121,6 +125,10 @@ class Controller:
         ax.set_ylabel("Total number of occurrences")
         ax.set_title("Views by continent of document " + "*" + docID[-4:])
         fig.show()
+
+    def view_by_continent_text(self, docID: str):
+        continents = self._model.view_by_continent(doc_id=docID)["continent"]
+        return continents.value_counts().to_string()
 
 
 if __name__ == "__main__":
