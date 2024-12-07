@@ -5,6 +5,7 @@ import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename
 from typing import override
 from Controller import Controller
+from GraphViz import GraphvizError
 from Model import Model
 
 
@@ -334,6 +335,9 @@ class AlsoLikes(PopUp):
         except ValueError as error:
             print(f"F21SCCW2: error: {error}", file=sys.stderr)
             _ = showerror("Model error", str(error))
+        except GraphvizError as error:
+            print(f"F21SCCW2: error: {error}", file=sys.stderr)
+            _ = showerror("Graphviz error", str(error))
         else:
             self.text.delete("1.0", tk.END)
             self.text.insert(tk.INSERT, s)
@@ -347,6 +351,9 @@ class AlsoLikes(PopUp):
         except ValueError as error:
             print(f"F21SCCW2: error: {error}", file=sys.stderr)
             _ = showerror("Model error", str(error))
+        except GraphvizError as error:
+            print(f"F21SCCW2: error: {error}", file=sys.stderr)
+            _ = showerror("Graphviz error", str(error))
 
     @override
     def go_to(self):

@@ -1,6 +1,7 @@
 import sys
 import argparse
 
+from GraphViz import GraphvizError
 import Model
 import View
 import Controller
@@ -133,6 +134,8 @@ def main() -> int:
             *action_task["args"]  # pyright: ignore[reportCallIssue, reportArgumentType]
         )
     except ValueError as error:
+        print(f"F21SCCW2: error: {error}", file=sys.stderr)
+    except GraphvizError as error:
         print(f"F21SCCW2: error: {error}", file=sys.stderr)
     else:
         if s is not None:
