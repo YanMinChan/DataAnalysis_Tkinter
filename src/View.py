@@ -56,7 +56,7 @@ class Window(tk.Tk):
         file = askopenfilename(defaultextension=".json")
         if isinstance(file, str):  # pyright: ignore[reportUnnecessaryIsInstance]
             self.cnt.load_file(file)
-            _ = showinfo("File Loaded")
+            _ = showinfo("File Loaded", f"The file {file} was loaded sucessfully")
 
 
 class PopUp(tk.Frame):

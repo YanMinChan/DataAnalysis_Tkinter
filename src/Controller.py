@@ -22,7 +22,7 @@ class Controller:
         fig, ax = plt.subplots()
         ax.barh(width=values, y=labels, linewidth=0.7)
         ax.set_ylabel("Reader user ID (last four characters)")
-        ax.set_xlabel("Total time spent")
+        ax.set_xlabel("Total time spent (seconds)")
         ax.set_title("Reader profile")
         fig.show()
 
@@ -57,7 +57,7 @@ class Controller:
         fig, ax = plt.subplots()
         ax.bar(height=values, x=labels)
         ax.set_xlabel("Browser")
-        ax.tick_params("x", labelsize=4, rotation=90)  # avoid label overcrowding
+        ax.tick_params("x", labelsize=8, rotation=90)  # avoid label overcrowding
         ax.set_ylabel("Total number of occurrences")
         ax.set_title('Views by browser (event_type="' + event_type + '")')
         fig.show()

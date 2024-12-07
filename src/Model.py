@@ -72,8 +72,14 @@ class Model:
             continent=docs_views_continent["visitor_country"]
         )
 
-        def normalize(val: str) -> str:
-            return pc.country_alpha2_to_continent_code(val)
+        def normalize(val) -> str:
+            if isinstance(val, str):
+                val = val.strip("\"' ")
+                try:
+                    return pc.country_alpha2_to_continent_code(val)
+                except KeyError:
+                    return "Unknown"
+            return "Unknown"
 
         docs_views_continent["continent"] = docs_views_continent["continent"].apply(
             normalize
@@ -159,7 +165,7 @@ class Model:
         and the dataframe with all documents read by viewser of the given document
         """
         viewers_for_doc = self._viewers_for(doc_id)
-        doc_already_read = self._document_read_for(user_id)["env_doc_id"].unique()
+        doc_already_read = list(self._document_read_for(user_id)["env_doc_id"].unique())
         all_documents = self._document_read_for(list(viewers_for_doc))
         reco = all_documents.value_counts(subset=["env_doc_id"])
         res_iter = [
