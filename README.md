@@ -1,4 +1,4 @@
-# F21SC_CW2
+# Data analysis using Python Tkinter Interface
 
 Python coursework for Industrial Programming
 
