@@ -8,7 +8,7 @@ SAMPLES = [
     os.path.join(os.path.dirname(__file__), "..", "samples", "sample_tiny.json"),
     os.path.join(os.path.dirname(__file__), "..", "samples", "sample_small.json"),
     os.path.join(os.path.dirname(__file__), "..", "samples", "sample_100k_lines.json"),
-    os.path.join(os.path.dirname(__file__), "..", "samples", "sample_3m_lines.json"),
+    #os.path.join(os.path.dirname(__file__), "..", "samples", "sample_3m_lines.json"),  # too large to fit in the limit of github
 ]
 
 
